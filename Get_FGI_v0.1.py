@@ -66,7 +66,7 @@ class Fgi_reader():
                         f_g_i_r10 = p.findall(line)
                         f_g_i_r10 = f_g_i_r10[0:32]
 
-        print(f_g_i, f_g_i_r9, f_g_i_r10)
+        # print(f_g_i, f_g_i_r9, f_g_i_r10)
         f_g_i = p4.findall(f_g_i[0])
         f_g_i_r9 = p4.findall(f_g_i_r9[0])
         f_g_i_r10 = p4.findall(f_g_i_r10[0])
@@ -143,7 +143,7 @@ class Fgi_reader():
 
         for i, j in enumerate(fgi_all):
             if j == str(1):
-                ue_cap[file_name] += '\n' + fgi_table[i][0]
+                ue_cap[file_name[0]] += '\n' + fgi_table[i][0]
 
         return ue_cap
 
@@ -157,5 +157,6 @@ class Fgi_reader():
 #     for key, value in ue_cap.items():
 #         wr.writerows([[key], [value.strip()]])
 f= input()
-s=Fgi_reader(f)
-print(s)
+s=Fgi_reader(f).fgi_read()
+for k,v in s.items():
+    print(v)
