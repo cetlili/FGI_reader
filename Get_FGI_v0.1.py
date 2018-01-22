@@ -8,10 +8,12 @@ class Fgi_reader():
 
     def fgi_read(self):
         import re
+        from os.path import basename
 
         # self.filename = "Great UCI.txt"
         # csvfilename = "Great UCI.CSV"
-        file_name = self.filename.split('.')
+
+        file_name = basename(self.filename).split('.')
         p1 = re.compile(r"'([0-1]+).*?")
         p2 = re.compile('bit length 32, (.*?) decimal')
         p3 = re.compile(r":([0-1]+).*?")
@@ -147,6 +149,7 @@ class Fgi_reader():
 
         return ue_cap
 
+# example of wrting result to a csv
 # for key, value in ue_cap.items():
 #     print(key,value)
 
@@ -156,7 +159,13 @@ class Fgi_reader():
 #     wr = csv.writer(csvfile, dialect='excel')
 #     for key, value in ue_cap.items():
 #         wr.writerows([[key], [value.strip()]])
-f= input()
-s=Fgi_reader(f).fgi_read()
-for k,v in s.items():
-    print(v)
+# -----------------------------------------------------
+
+# example of literate a folder
+# import os
+# s={}
+# path = 'D:/ue_cap/'
+# for filename in os.listdir(path):
+#
+#     s.update(Fgi_reader(os.path.join(path,filename)).fgi_read())
+#     print(s.keys(),s.values())
