@@ -9,6 +9,7 @@ class Fgi_reader():
     def fgi_read(self):
         import re
         from os.path import basename
+        import sys
 
         # self.filename = "Great UCI.txt"
         # csvfilename = "Great UCI.CSV"
@@ -26,7 +27,7 @@ class Fgi_reader():
         f_g_i_r10 = []
         ue_cap = {file_name[0]: ''}
 
-        with open(self.filename) as file:
+        with open(self.filename,encoding='utf-8',mode='r') as file:
             for line in file:
                 if '{' in line:
                     phone_type = "iphone"
@@ -69,11 +70,15 @@ class Fgi_reader():
                         f_g_i_r10 = f_g_i_r10[0:32]
 
         # print(f_g_i, f_g_i_r9, f_g_i_r10)
-        f_g_i = p4.findall(f_g_i[0])
-        f_g_i_r9 = p4.findall(f_g_i_r9[0])
-        f_g_i_r10 = p4.findall(f_g_i_r10[0])
+        if f_g_i:
+            f_g_i = p4.findall(f_g_i[0])
+        if f_g_i_r9:
+            f_g_i_r9 = p4.findall(f_g_i_r9[0])
+        if f_g_i_r10:
+            f_g_i_r10 = p4.findall(f_g_i_r10[0])
 
         fgi_all = f_g_i + f_g_i_r9 + f_g_i_r10
+
 
         fgi_table = [[
                      ' Intra-subframe freq hopping for PUSCH scheduled by UL grant; DCI format 3a; Aperiodic CQI/PMI/RI report on PUSCH: Mode 2-0 & 2-2 - Supported'],
@@ -142,30 +147,33 @@ class Fgi_reader():
                  [' Undefined - Not supported'], [' Undefined - Not supported'], [' Undefined - Not supported'],
                  [' Undefined - Not supported'], [' Undefined - Not supported'], [' Undefined - Not supported'],
                  [' Undefined - Not supported']]
+        if not fgi_all:
+            return ue_cap
+        else:
+            for i, j in enumerate(fgi_all):
+                if j == str(1):
+                    ue_cap[file_name[0]] += '\n' + fgi_table[i][0]
 
-        for i, j in enumerate(fgi_all):
-            if j == str(1):
-                ue_cap[file_name[0]] += '\n' + fgi_table[i][0]
+            return ue_cap
 
-        return ue_cap
 
-# example of wrting result to a csv
-# for key, value in ue_cap.items():
-#     print(key,value)
-
-# import csv
-#
-# with open(csvfilename, 'w', newline='') as csvfile:
-#     wr = csv.writer(csvfile, dialect='excel')
-#     for key, value in ue_cap.items():
-#         wr.writerows([[key], [value.strip()]])
-# -----------------------------------------------------
 
 # example of literate a folder
 # import os
 # s={}
-# path = 'D:/ue_cap/'
+# path = 'L:/python_file/Ue_cap/'
 # for filename in os.listdir(path):
 #
 #     s.update(Fgi_reader(os.path.join(path,filename)).fgi_read())
 #     print(s.keys(),s.values())
+
+# example to write to a csv file
+
+# import csv
+#
+# csvfile = 'Ue_FGI_Info.csv'
+# with open(csvfile, 'w', newline='') as csvfile:
+#     fieldname =list(s.keys())
+#     writer = csv.DictWriter(csvfile, fieldnames=fieldname)
+#     writer.writeheader()
+#     writer.writerow(s)
