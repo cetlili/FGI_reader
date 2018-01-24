@@ -211,24 +211,24 @@ def fgi_des(filename):
 # print(s)
 
 # example of literate a folder
-import os
-s={}
-path = 'D:/Ue_cap/'
-for filename in os.listdir(path):
-
-    s.update(fgi_des(os.path.join(path,filename)))
-    print(fgi_read(os.path.join(path,filename)))
+# import os
+# s={}
+# path = 'D:/Ue_cap/'
+# for filename in os.listdir(path):
+#
+#     s.update(fgi_des(os.path.join(path,filename)))
+#     print(fgi_read(os.path.join(path,filename)))
 # print(s['UCI surface pro LTE - without RequestFreqBand'])
 
 # example to write to a csv file
 
 
-import csv
-
-csvfile = 'Ue_FGI_Info.csv'
-with open(csvfile, 'w',newline='') as csvfile:
-    fieldnames =list(s.keys())
-
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames, dialect='excel')
-    writer.writeheader()
-    writer.writerow(s)
+# import csv
+#
+# csvfile = 'Ue_FGI_Info.csv'
+# with open(csvfile, 'w',newline='') as csvfile:
+#     fieldnames =list(s.keys())
+#
+#     writer = csv.DictWriter(csvfile, fieldnames=fieldnames, dialect='excel')
+#     writer.writeheader()
+#     writer.writerow(s)
