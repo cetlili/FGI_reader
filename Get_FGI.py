@@ -15,10 +15,12 @@ class Fgi_reader():
         # csvfilename = "Great UCI.CSV"
 
         file_name = basename(self.filename).split('.')
-        p1 = re.compile(r"'([0-1]+).*?")
+        # define pattern
+        p1 = re.compile(r"'([0-1 ]+)'.*?") #parttern for iphone and note8
         p2 = re.compile('bit length 32, (.*?) decimal')
         p3 = re.compile(r":([0-1]+).*?")
         p4 = re.compile('[0-1]{1}')
+        p5 = re.compile('Bin	:(.*)')
 
         k1 = 'featureGroupIndicators'
         k2 = 'featureGroupIndRel9Add'
@@ -26,50 +28,91 @@ class Fgi_reader():
         k4 = 'bit length 32'
         f_g_i_r10 = []
         ue_cap = {file_name[0]: ''}
-
+        spec = '{fill}{align}{width}{type}'.format(fill='0', align='>', width=32, type='b')# pattern to turn dec to bin and keep 0s at leading
         with open(self.filename,encoding='utf-8',mode='r') as file:
+            f=file.readlines()
+            file.seek(0)
             for line in file:
                 if '{' in line:
                     phone_type = "iphone"
                     break
-                else:
-                    phone_type = 'others'
+                else:phone_type='other'
+
             file.seek(0)
+
             if phone_type != "iphone":
                 p = p2
             else:
                 p = p1
 
-            for line in file:
+            for n,line in enumerate(file):
+                if k1 in line and not p3.findall(line) and not p2.findall(line) and not p1.findall(line):
+                    f_g_i_t = p5.findall(f[(n+1)])[0].replace(" ","") #remove space in the string
+                    f_g_i=[format(int(f_g_i_t,16),spec)]
 
-                if k1 in line and k4 not in line and phone_type != 'iphone':
+                    continue
+                if k2 in line and not p3.findall(line) and not p2.findall(line) and not p1.findall(line):
+                    f_g_i_t = p5.findall(f[(n + 1)])[0].replace(" ", "")
+                    f_g_i_r9 = [format(int(f_g_i_t, 16), spec)]
+                    continue
+
+                if k3 in line and not p3.findall(line) and not p2.findall(line) and not p1.findall(line):
+                    f_g_i_t = p5.findall(f[(n + 1)])[0].replace(" ", "")
+                    f_g_i_r10 = [format(int(f_g_i_t, 16), spec)]
+                    continue
+
+                if k1 in line and k4 not in line and phone_type != 'iphone' and '=' in line:
+                    p=p1
+                    f_g_i = p.findall(line)
+
+                    f_g_i = f_g_i# only need first digits
+
+                elif k1 in line and k4 not in line and phone_type != 'iphone':
                     p = p3
                     f_g_i = p.findall(line)
-                    f_g_i = f_g_i[0:32]
+
+                    f_g_i = f_g_i
+
+                    continue
                 elif k1 in line:
                     f_g_i = p.findall(line)
-                    f_g_i = f_g_i[0:32]
+                    f_g_i = f_g_i
+                    continue
 
-                if k2 in line and k4 not in line and phone_type != 'iphone':
+                if k2 in line and k4 not in line and phone_type != 'iphone' and '=' in line:
+                    p = p1
+                    f_g_i_r9 = p.findall(line)
+                    f_g_i_r9 = f_g_i_r9
+                elif k2 in line and k4 not in line and phone_type != 'iphone':
                     p = p3
                     f_g_i_r9 = p.findall(line)
-                    f_g_i_r9 = f_g_i_r9[0:32]
+                    f_g_i_r9 = f_g_i_r9
+                    continue
                 elif k2 in line:
                     f_g_i_r9 = p.findall(line)
-                    f_g_i_r9 = f_g_i_r9[0:32]
+                    f_g_i_r9 = f_g_i_r9
+                    continue
 
-                if k3 in line and k4 not in line and phone_type != 'iphone':
+                if k3 in line and k4 not in line and phone_type != 'iphone' and '=' in line:
+                    p = p1
+                    f_g_i_r10 = p.findall(line)
+                    f_g_i_r10 = f_g_i_r10
+                    continue
+                elif k3 in line and k4 not in line and phone_type != 'iphone':
                     p = p3
                     if not f_g_i_r10:
                         f_g_i_r10 = p.findall(line)
-                        f_g_i_r10 = f_g_i_r10[0:32]
+                        f_g_i_r10 = f_g_i_r10
+                    continue
 
                 elif k3 in line:
                     if not f_g_i_r10:
                         f_g_i_r10 = p.findall(line)
-                        f_g_i_r10 = f_g_i_r10[0:32]
 
-        # print(f_g_i, f_g_i_r9, f_g_i_r10)
+                        f_g_i_r10 = f_g_i_r10
+
+                    continue
+
         if f_g_i:
             f_g_i = p4.findall(f_g_i[0])
         if f_g_i_r9:
@@ -158,22 +201,28 @@ class Fgi_reader():
 
 
 
+
+
+
 # example of literate a folder
 # import os
 # s={}
-# path = 'L:/python_file/Ue_cap/'
+# path = 'D:/Ue_cap/'
 # for filename in os.listdir(path):
 #
 #     s.update(Fgi_reader(os.path.join(path,filename)).fgi_read())
-#     print(s.keys(),s.values())
+
+# print(s['UCI surface pro LTE - without RequestFreqBand'])
 
 # example to write to a csv file
 
+#
 # import csv
 #
 # csvfile = 'Ue_FGI_Info.csv'
-# with open(csvfile, 'w', newline='') as csvfile:
-#     fieldname =list(s.keys())
-#     writer = csv.DictWriter(csvfile, fieldnames=fieldname)
+# with open(csvfile, 'w',newline='') as csvfile:
+#     fieldnames =list(s.keys())
+#     print(fieldnames)
+#     writer = csv.DictWriter(csvfile, fieldnames=fieldnames, dialect='excel')
 #     writer.writeheader()
 #     writer.writerow(s)
